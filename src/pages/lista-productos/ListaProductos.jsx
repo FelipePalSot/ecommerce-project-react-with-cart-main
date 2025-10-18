@@ -1,7 +1,7 @@
 import "./listaProductos-styles.css";
 import ProductCard from "../../components/ProductCard.jsx";
+import React, { useState, useMemo } from 'react';
 
-/** Productos de ejemplo (puedes mover esto a un JSON luego) */
 const PRODUCTS = [
   {
     id: "detergente-polvo-150g",
@@ -9,7 +9,7 @@ const PRODUCTS = [
     price: 3.5,
     img: "/assets/products/detergente-polvo-150g.jpg",
     meta: "Lavandería • Rinde 5 lavadas",
-    category: "lavanderia",
+    category: "Lavanderia",
   },
   {
     id: "lavavajillas-250ml",
@@ -38,9 +38,23 @@ const PRODUCTS = [
 ];
 
 export default function ListaProductos() {
+
+  const [category, setCategory] = useState('all');
+  
+
+  const filteredProducts = useMemo(() => {
+    return PRODUCTS.filter(product => {
+      const matchesCategory = category === 'todas' || 
+        product.category.toLowerCase() === category.toLowerCase();
+
+      return matchesCategory;
+    });
+  }, [category]);
+
+
   return (
     <main className="container">
-      {/* Hero (igual que tu HTML) */}
+
       <section className="hero hero--clean">
         <div className="hero__content">
           <h1 className="hero__title">Artículos de limpieza confiables</h1>
@@ -51,36 +65,46 @@ export default function ListaProductos() {
         </picture>
       </section>
 
-      {/* Filtros simples (aún sin lógica de filtrado) */}
+      
       <section className="filters" aria-label="Filtros del catálogo">
         <div className="filters__row">
           <div className="filters__group">
             <label htmlFor="cat">Categoría</label>
-            <select id="cat" name="cat" defaultValue="">
-              <option value="">Todas</option>
-              <option value="lavanderia">Lavandería</option>
-              <option value="cocina">Cocina</option>
-              <option value="baño">Baño</option>
-              <option value="multiusos">Multiusos</option>
-            </select>
-          </div>
-          <div className="filters__group">
-            <label htmlFor="ord">Ordenar</label>
-            <select id="ord" name="ord" defaultValue="relevancia">
-              <option value="relevancia">Relevancia</option>
-              <option value="precio-asc">Precio: menor a mayor</option>
-              <option value="precio-desc">Precio: mayor a menor</option>
-              <option value="nombre">Nombre</option>
+            <select 
+              id="cat" 
+              name="cat" 
+              className="input"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              >
+                <option value="todas">Todas</option>
+                <option value="lavanderia">Lavanderia</option>
+                <option value="cocina">Cocina</option>
+                <option value="baño">Baño</option>
+                <option value="multiusos">Multiusos</option>
             </select>
           </div>
         </div>
       </section>
 
-      {/* Grilla de productos */}
-      <section className="grid grid--products" aria-label="Listado de productos">
+      
+      {/* <section className="grid--products" aria-label="Listado de productos">
         {PRODUCTS.map((p) => (
           <ProductCard key={p.id} product={p} />
         ))}
+      </section> */}
+
+
+      <section className="grid--products" aria-label="Listado de productos">
+        {filteredProducts.length > 0 ? (
+          filteredProducts.map((p) => (
+            <ProductCard key={p.id} product={p} />
+          ))
+        ) : (
+          <div className="text-center py-8" style={{ flexBasis: '100%' }}>
+            <p className="text-lg text-gray-600">No se encontraron productos que coincidan con su búsqueda.</p>
+          </div>
+        )}
       </section>
     </main>
   );

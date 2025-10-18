@@ -14,7 +14,8 @@ body {
 }
 
 .container{
-  margin: 1rem 0rem 0rem 5rem;
+  margin: 1rem;
+  padding: 0 16px;
 }
 
 a { 
@@ -23,27 +24,28 @@ a {
 }
 
 .page-title {
-  font-size: 1.35rem;
-  margin: 1.5rem 0 1rem;
+  font-size: 1.15rem;
+  margin: 1.25rem 0 1rem;
 }
 
-.btn-container { /* Nuevo contenedor para el botón */
+.btn-container {
   display: flex;
-  justify-content: center; /* Centra horizontalmente */
-  width: 100%; /* Asegura que el contenedor ocupe todo el ancho disponible */
+  justify-content: center;
+  width: 100%;
+  margin-top: 1rem;
 }
 
 .btn {
   gap: .5rem;
-  padding: .7rem 1rem;
+  padding: .65rem .9rem;
   border-radius: 14px;
   border: 1px solid #a9e5dd;
   background: #26c43c;
-  color: #808080;
+  color: #fff;
   font-weight: 600;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   cursor: pointer;
-  width: fit-content; /* El botón se ajusta al contenido */
+  width: fit-content;
 }
 
 input {
@@ -62,13 +64,14 @@ input {
   font-weight: 600; 
   margin-bottom: .35rem; 
   color: #51646c; 
-  font-size: 0.875rem; 
+  font-size: 0.8125rem; 
 }
 
 .auth__container { 
   display: grid; 
   place-items: center; 
-  min-height: 37rem; 
+  min-height: 30rem;
+  padding: 1rem;
 }
 
 .auth__panel {
@@ -76,7 +79,7 @@ input {
   background: #fff; 
   border: 1px solid #dbe7e5;
   border-radius: 14px; 
-  padding: 1.5rem;
+  padding: 1.25rem;
   box-shadow: 0 6px 20px rgba(0,0,0,.08);
 }
 
@@ -86,16 +89,62 @@ input {
 }
 .auth .form { 
   display: grid; 
-  gap: 1rem; 
+  gap: .875rem; 
 }
 
 .auth__alt { 
   text-align: center; 
-  color: #51646c; 
+  color: #51646c;
+  font-size: 0.875rem;
 }
 
 .link { 
   font-weight: 700; 
+}
+
+/* Media Queries */
+@media (min-width: 40rem) {
+  .container {
+    margin: 1.5rem 2rem;
+  }
+  
+  .page-title {
+    font-size: 1.25rem;
+  }
+  
+  .btn {
+    padding: .7rem 1rem;
+    font-size: 0.9375rem;
+  }
+  
+  .auth__panel {
+    padding: 1.5rem;
+  }
+  
+  .form-field label {
+    font-size: 0.875rem;
+  }
+  
+  .auth .form {
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 48rem) {
+  .container {
+    margin: 2rem auto;
+    max-width: 1200px;
+    padding: 0 24px;
+  }
+  
+  .page-title {
+    font-size: 1.35rem;
+    margin: 1.5rem 0 1rem;
+  }
+  
+  .auth__container {
+    min-height: 37rem;
+  }
 }
 
 button, .btn { 
