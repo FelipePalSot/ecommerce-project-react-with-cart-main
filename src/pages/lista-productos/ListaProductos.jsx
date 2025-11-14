@@ -1,56 +1,74 @@
 import "./listaProductos-styles.css";
 import ProductCard from "../../components/ProductCard.jsx";
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import API_CONFIG from '../../config/api.js';
 
-const PRODUCTS = [
-  {
-    id: "detergente-polvo-150g",
-    title: "Detergente en polvo 150 g",
-    price: 3.5,
-    img: "/assets/products/detergente-polvo-150g.jpg",
-    meta: "Lavandería • Rinde 5 lavadas",
-    category: "Lavanderia",
-  },
-  {
-    id: "lavavajillas-250ml",
-    title: "Lavavajillas 250 ml",
-    price: 5.0,
-    img: "/assets/products/lavavajillas-250ml.jpg",
-    meta: "Cocina • Desengrasa rápido",
-    category: "cocina",
-  },
-  {
-    id: "multiusos-500ml",
-    title: "Limpiador multiusos 500 ml",
-    price: 7.8,
-    img: "/assets/products/multiusos-500ml.jpg",
-    meta: "Multiusos • Aroma fresco",
-    category: "multiusos",
-  },
-  {
-    id: "lejia-1l",
-    title: "Lejía 1 L",
-    price: 4.2,
-    img: "/assets/products/lejia-1l.jpg",
-    meta: "Desinfección • Cloro",
-    category: "baño",
-  },
-];
+const API_URL = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CATALOGO}`;
 
 export default function ListaProductos() {
+  const [products, setProducts] = useState([]);
+  const [category, setCategory] = useState('todas');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const [category, setCategory] = useState('all');
-  
+  // Fetch productos desde la API
+  useEffect(() => {
+    const fetchProductos = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(API_URL);
+        
+        if (!response.ok) {
+          throw new Error('Error al cargar los productos');
+        }
+        
+        const data = await response.json();
+        setProducts(data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching productos:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchProductos();
+  }, []);
+
+  // Mapear categorías del backend a las del frontend
+  const mapCategoria = (categoriaBackend) => {
+    const categoriaMap = {
+      'Detergentes': 'lavanderia',
+      'Lavavajillas': 'cocina',
+      'Desinfectantes': 'baño',
+      'Multiusos': 'multiusos',
+      'Suavizantes': 'lavanderia'
+    };
+    return categoriaMap[categoriaBackend] || 'multiusos';
+  };
+
+  // Transformar productos del backend al formato del frontend
+  const transformedProducts = useMemo(() => {
+    return products.map(producto => ({
+      id: producto.id,
+      title: producto.nombre,
+      price: producto.precio,
+      img: `/assets/products/${producto.imagen}`,
+      meta: `${producto.categoria.nombre} • Stock: ${producto.stock}`,
+      category: mapCategoria(producto.categoria.nombre),
+      stock: producto.stock
+    }));
+  }, [products]);
+
+  // Filtrar productos por categoría
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter(product => {
+    return transformedProducts.filter(product => {
       const matchesCategory = category === 'todas' || 
         product.category.toLowerCase() === category.toLowerCase();
-
       return matchesCategory;
     });
-  }, [category]);
-
+  }, [transformedProducts, category]);
 
   return (
     <main className="container">
@@ -76,6 +94,7 @@ export default function ListaProductos() {
               className="input"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
+              disabled={loading}
               >
                 <option value="todas">Todas</option>
                 <option value="lavanderia">Lavanderia</option>
@@ -88,15 +107,22 @@ export default function ListaProductos() {
       </section>
 
       
-      {/* <section className="grid--products" aria-label="Listado de productos">
-        {PRODUCTS.map((p) => (
-          <ProductCard key={p.id} product={p} />
-        ))}
-      </section> */}
-
-
       <section className="grid--products" aria-label="Listado de productos">
-        {filteredProducts.length > 0 ? (
+        {loading ? (
+          <div className="text-center py-8" style={{ flexBasis: '100%' }}>
+            <p className="text-lg text-gray-600">Cargando productos...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-8" style={{ flexBasis: '100%' }}>
+            <p className="text-lg text-red-600">Error: {error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="btn btn-primary mt-4"
+            >
+              Reintentar
+            </button>
+          </div>
+        ) : filteredProducts.length > 0 ? (
           filteredProducts.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))
